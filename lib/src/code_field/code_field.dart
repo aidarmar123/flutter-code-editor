@@ -441,7 +441,7 @@ class _CodeFieldState extends State<CodeField> {
       scrollController: _codeScroll,
       decoration: const InputDecoration(
         filled: true,
-        fillColor: Color(0xFFE32F2F),
+        fillColor: Color(0xFF171717),
         isCollapsed: true,
         contentPadding: EdgeInsets.symmetric(vertical: 16),
         disabledBorder: InputBorder.none,
