@@ -410,14 +410,13 @@ class _CodeFieldState extends State<CodeField> {
 
     final themeData = Theme.of(context);
     final styles = CodeTheme.of(context)?.styles;
-    // _backgroundCol = widget.background ??
-    //     styles?[rootKey]?.backgroundColor ??
-    //     DefaultStyles.backgroundColor;
-    // if (widget.decoration != null) {
-    //   _backgroundCol = null;
-    // }
+    _backgroundCol = widget.background ??
+        styles?[rootKey]?.backgroundColor ??
+        DefaultStyles.backgroundColor;
+    if (widget.decoration != null) {
+      _backgroundCol = null;
+    }
 
-    _backgroundCol = const Color(0xff171717);
 
 
     final defaultTextStyle = TextStyle(
@@ -475,7 +474,7 @@ class _CodeFieldState extends State<CodeField> {
         decoration: widget.decoration,
         color: _backgroundCol,
         key: _codeFieldKey,
-        padding: const EdgeInsets.only(left: 8),
+        padding: widget.gutterStyle.showGutter ? const EdgeInsets.only(left: 8) : EdgeInsets.zero,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -511,6 +510,7 @@ class _CodeFieldState extends State<CodeField> {
     );
 
     return GutterWidget(
+
       codeController: widget.controller,
       style: gutterStyle,
       scrollController: _numberScroll,
