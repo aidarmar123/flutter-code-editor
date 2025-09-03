@@ -119,6 +119,9 @@ final _shortcuts = <ShortcutActivator, Intent>{
 };
 
 class CodeField extends StatefulWidget {
+
+  final bool enableInteractiveSelection;
+
   /// {@macro flutter.widgets.textField.minLines}
   final int? minLines;
 
@@ -203,6 +206,7 @@ class CodeField extends StatefulWidget {
     this.lineNumberBuilder,
     this.focusNode,
     this.onChanged,
+    this.enableInteractiveSelection = true,
     @Deprecated('Use gutterStyle instead') this.lineNumbers,
     @Deprecated('Use gutterStyle instead')
     this.lineNumberStyle = const GutterStyle(),
@@ -447,6 +451,7 @@ class _CodeFieldState extends State<CodeField> {
       enabled: widget.enabled,
       onChanged: widget.onChanged,
       readOnly: widget.readOnly,
+      enableInteractiveSelection: widget.enableInteractiveSelection,
     );
 
     final editingField = Theme(
