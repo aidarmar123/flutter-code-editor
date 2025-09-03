@@ -410,10 +410,10 @@ class _CodeFieldState extends State<CodeField> {
 
     final themeData = Theme.of(context);
     final styles = CodeTheme.of(context)?.styles;
-    _backgroundCol = widget.background ??
-        styles?[rootKey]?.backgroundColor ??
-        DefaultStyles.backgroundColor;
-
+    // _backgroundCol = widget.background ??
+    //     styles?[rootKey]?.backgroundColor ??
+    //     DefaultStyles.backgroundColor;
+    _backgroundCol = const Color(0xff171717);
     if (widget.decoration != null) {
       _backgroundCol = null;
     }
