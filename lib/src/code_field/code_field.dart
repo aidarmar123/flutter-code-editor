@@ -474,7 +474,7 @@ class _CodeFieldState extends State<CodeField> {
         decoration: widget.decoration,
         color: _backgroundCol,
         key: _codeFieldKey,
-        padding: widget.gutterStyle.showGutter ? const EdgeInsets.only(left: 8) : EdgeInsets.zero,
+        padding:EdgeInsets.zero,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
