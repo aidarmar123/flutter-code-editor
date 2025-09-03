@@ -413,10 +413,12 @@ class _CodeFieldState extends State<CodeField> {
     // _backgroundCol = widget.background ??
     //     styles?[rootKey]?.backgroundColor ??
     //     DefaultStyles.backgroundColor;
+    // if (widget.decoration != null) {
+    //   _backgroundCol = null;
+    // }
+
     _backgroundCol = const Color(0xff171717);
-    if (widget.decoration != null) {
-      _backgroundCol = null;
-    }
+
 
     final defaultTextStyle = TextStyle(
       color: styles?[rootKey]?.color ?? DefaultStyles.textColor,
