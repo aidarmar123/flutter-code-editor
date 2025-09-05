@@ -36,8 +36,38 @@ import 'error_range.dart';
 import 'search_result_highlighted_builder.dart';
 import 'span_builder.dart';
 
+class _TrackedError {
+  ErrorRange range;
+  final String originalText;
+
+  _TrackedError(this.range, this.originalText);
+}
+
 class CodeController extends TextEditingController {
-  List<ErrorRange> errorRanges = [];
+  // хранит tracked-диапазоны с оригинальными подстроками
+  List<_TrackedError> _trackedErrors = [];
+
+  List<ErrorRange> get errorRanges => _trackedErrors.map((t) => t.range).toList();
+
+  set errorRanges(List<ErrorRange> ranges) {
+    _trackedErrors = ranges.map((r) {
+      String original = '';
+      // безопасно берём подстроку, если возможно
+      if (text.length >= r.end && r.start >= 0 && r.start < r.end) {
+        try {
+          original = text.substring(r.start, r.end);
+        } catch (_) {
+          original = '';
+        }
+      }
+      return _TrackedError(r, original);
+    }).toList(growable: false);
+
+    // уведомим слушателей, чтобы UI обновился
+    notifyListeners();
+  }
+
+
   Mode? _language;
 
   /// A highlight language to parse the text with
@@ -166,7 +196,6 @@ class CodeController extends TextEditingController {
     this.readOnly = false,
     this.params = const EditorParams(),
     this.modifiers = defaultCodeModifiers,
-    this.errorRanges = const [],
   })  : _analyzer = analyzer,
         _readOnlySectionNames = readOnlySectionNames,
         _code = Code.empty,
@@ -175,7 +204,7 @@ class CodeController extends TextEditingController {
     this.visibleSectionNames = visibleSectionNames;
     _code = _createCode(text ?? '');
     fullText = text ?? '';
-
+    addListener(_removeErrorRangesIfChanged);
     addListener(_scheduleAnalysis);
     addListener(_updateSearchResult);
     _searchSettingsController.addListener(_updateSearchResult);
@@ -198,6 +227,71 @@ class CodeController extends TextEditingController {
     popupController = PopupController(onCompletionSelected: insertSelectedWord);
 
     unawaited(analyzeCode());
+  }
+  String? _lastText;
+
+  void _removeErrorRangesIfChanged() {
+    final currentText = text;
+
+    // если первый раз вызываем — просто запоминаем текст
+    if (_lastText == null) {
+      _lastText = currentText;
+      return;
+    }
+
+    final diff = currentText.length - _lastText!.length;
+
+    if (diff != 0) {
+      // вычисляем индекс, где произошло изменение
+      final minLen = currentText.length < _lastText!.length
+          ? currentText.length
+          : _lastText!.length;
+      int changeIndex = 0;
+      while (changeIndex < minLen &&
+          currentText[changeIndex] == _lastText![changeIndex]) {
+        changeIndex++;
+      }
+
+      // сдвигаем все диапазоны, которые находятся ниже changeIndex
+      _trackedErrors = _trackedErrors.map((tracked) {
+        final r = tracked.range;
+
+        if (r.start >= changeIndex) {
+          return _TrackedError(
+            ErrorRange(r.start + diff, r.end + diff, style: r.style),
+            tracked.originalText,
+          );
+        }
+        return tracked;
+      }).toList();
+    }
+
+    bool anyRemoved = false;
+    final keep = <_TrackedError>[];
+
+    for (final tracked in _trackedErrors) {
+      final r = tracked.range;
+
+      if (r.start < 0 || r.end > currentText.length || r.start >= r.end) {
+        anyRemoved = true;
+        continue;
+      }
+
+      final currentSub = currentText.substring(r.start, r.end);
+      if (currentSub != tracked.originalText) {
+        anyRemoved = true;
+        continue;
+      }
+
+      keep.add(tracked);
+    }
+
+    if (anyRemoved) {
+      _trackedErrors = keep;
+      notifyListeners();
+    }
+
+    _lastText = currentText;
   }
 
   void _updateSearchResult() {

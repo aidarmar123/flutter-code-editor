@@ -25,7 +25,8 @@ class CodeEditor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     controller.errorRanges = [
-      ErrorRange(0, 15),
+      ErrorRange(15, 40),
+
     ];
     return MaterialApp(
       debugShowCheckedModeBanner: false,
