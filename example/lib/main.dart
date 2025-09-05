@@ -18,12 +18,15 @@ final controller = CodeController(
   language: java,
 );
 
+
 class CodeEditor extends StatelessWidget {
   const CodeEditor({super.key});
 
   @override
   Widget build(BuildContext context) {
-    //controller.visibleSectionNames = {'section1'};
+    controller.errorRanges = [
+      ErrorRange(0, 15),
+    ];
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(

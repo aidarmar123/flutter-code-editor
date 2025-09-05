@@ -120,6 +120,10 @@ final _shortcuts = <ShortcutActivator, Intent>{
 
 class CodeField extends StatefulWidget {
 
+
+
+  final bool autoCloseBrackets;
+  final bool autoCloseQuotes;
   final Color? backgroundField;
 
   /// {@macro flutter.widgets.textField.enableInteractiveSelection}
@@ -211,6 +215,8 @@ class CodeField extends StatefulWidget {
     this.onChanged,
     this.backgroundField,
     this.enableInteractiveSelection = true,
+    this.autoCloseBrackets = true,
+    this.autoCloseQuotes = true,
     @Deprecated('Use gutterStyle instead') this.lineNumbers,
     @Deprecated('Use gutterStyle instead')
     this.lineNumberStyle = const GutterStyle(),
@@ -244,7 +250,7 @@ class _CodeFieldState extends State<CodeField> {
   String? lines;
   String longestLine = '';
   Size? windowSize;
-  late TextStyle textStyle;
+  late TextStyle textStyle = const TextStyle();
   Color? _backgroundCol;
 
   final _editorKey = GlobalKey();

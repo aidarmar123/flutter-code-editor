@@ -28,9 +28,8 @@ class CodeEditor extends StatelessWidget {
         body: CodeTheme(
           data: CodeThemeData(styles: monokaiSublimeTheme),
           child: SingleChildScrollView(
-            child: TextField(
+            child: CodeField(
               controller: controller,
-              maxLines: null,
             ),
           ),
         ),

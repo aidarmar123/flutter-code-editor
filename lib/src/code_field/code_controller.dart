@@ -32,10 +32,12 @@ import 'actions/redo.dart';
 import 'actions/search.dart';
 import 'actions/tab.dart';
 import 'actions/undo.dart';
+import 'error_range.dart';
 import 'search_result_highlighted_builder.dart';
 import 'span_builder.dart';
 
 class CodeController extends TextEditingController {
+  List<ErrorRange> errorRanges = [];
   Mode? _language;
 
   /// A highlight language to parse the text with
@@ -164,6 +166,7 @@ class CodeController extends TextEditingController {
     this.readOnly = false,
     this.params = const EditorParams(),
     this.modifiers = defaultCodeModifiers,
+    this.errorRanges = const [],
   })  : _analyzer = analyzer,
         _readOnlySectionNames = readOnlySectionNames,
         _code = Code.empty,
@@ -946,6 +949,7 @@ class CodeController extends TextEditingController {
         code: _code,
         theme: _getTheme(context),
         rootStyle: style,
+        errorRanges: errorRanges,
       ).build();
     }
 

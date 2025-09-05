@@ -12,6 +12,7 @@ export 'src/code/text_range.dart';
 export 'src/code/tokens.dart';
 
 export 'src/code_field/code_controller.dart';
+export 'src/code_field/error_range.dart';
 export 'src/code_field/code_field.dart';
 export 'src/code_field/editor_params.dart';
 export 'src/code_field/js_workarounds/js_workarounds.dart'

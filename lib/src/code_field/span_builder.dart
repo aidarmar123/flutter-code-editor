@@ -5,18 +5,24 @@ import '../code/code.dart';
 import '../code/text_style.dart';
 import '../code_theme/code_theme_data.dart';
 import '../highlight/node.dart';
+import 'error_range.dart';
+
+
 
 class SpanBuilder {
   final Code code;
   final CodeThemeData? theme;
   final TextStyle? rootStyle;
 
-  int _visibleLineIndex = 0;
+  final List<ErrorRange> errorRanges;
 
+  int _visibleLineIndex = 0;
+  int _globalOffset = 0;
   SpanBuilder({
     required this.code,
     required this.theme,
     this.rootStyle,
+    this.errorRanges = const []
   });
 
   TextSpan build() {
@@ -60,7 +66,49 @@ class SpanBuilder {
     final processedStyle = _paleIfRequired(style);
 
     _updateLineIndex(node);
+    final text = node.value ?? '';
+    final spans = <TextSpan>[];
 
+    if (text.isNotEmpty) {
+      int localStart = 0;
+      int localEnd = text.length;
+
+      // Проверяем на попадание в errorRanges
+      for (final range in errorRanges) {
+        final overlapStart = range.start.clamp(_globalOffset, _globalOffset + text.length);
+        final overlapEnd = range.end.clamp(_globalOffset, _globalOffset + text.length);
+
+        if (overlapStart < overlapEnd) {
+          // Часть до ошибки
+          if (overlapStart > _globalOffset) {
+            spans.add(TextSpan(
+              text: text.substring(0, overlapStart - _globalOffset),
+              style: processedStyle,
+            ));
+          }
+          // Ошибка
+          spans.add(TextSpan(
+            text: text.substring(overlapStart - _globalOffset, overlapEnd - _globalOffset),
+            style: processedStyle?.copyWith(
+              decoration: TextDecoration.underline,
+              decorationColor: const Color(0xFFFF0000),
+              decorationStyle: TextDecorationStyle.wavy,
+            ),
+          ));
+          // Часть после
+          if (overlapEnd < _globalOffset + text.length) {
+            spans.add(TextSpan(
+              text: text.substring(overlapEnd - _globalOffset),
+              style: processedStyle,
+            ));
+          }
+          _globalOffset += text.length;
+          return TextSpan(children: spans);
+        }
+      }
+    }
+
+    _globalOffset += text.length;
     return TextSpan(
       text: node.value,
       children: _buildList(
